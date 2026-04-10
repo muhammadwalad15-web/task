@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Testable Todo Item Card</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet" />
+	<style>
+		:root {
+			--bg-1: #fff9f2;
+			--bg-2: #ffe8cc;
+			--card: #fffefb;
+			--text: #1e293b;
+			--muted: #475569;
+			--line: #d6c7b6;
+			--high-bg: #fee2e2;
+			--high-text: #9f1239;
+			--status-bg: #e0f2fe;
+			--status-text: #075985;
+			--tag-bg: #ecfccb;
+			--tag-text: #365314;
+			--accent: #0f766e;
+			--accent-strong: #115e59;
+			--danger: #991b1b;
+			--danger-bg: #fee2e2;
+			--shadow: 0 16px 40px rgba(30, 41, 59, 0.12);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			margin: 0;
+			min-height: 100vh;
+			color: var(--text);
+			font-family: "Source Sans 3", sans-serif;
+			background:
+				radial-gradient(circle at 15% 10%, rgba(251, 146, 60, 0.22), transparent 35%),
+				radial-gradient(circle at 85% 20%, rgba(20, 184, 166, 0.2), transparent 30%),
+				linear-gradient(155deg, var(--bg-1), var(--bg-2));
+			display: flex;
+			justify-content: center;
+			padding: 1rem;
+		}
+
+		.page-stack {
+			width: 100%;
+			max-width: 1020px;
+			display: grid;
+			gap: 1rem;
+			justify-items: center;
+		}
+
+		.todo-card {
+			width: 100%;
+			max-width: 480px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			box-shadow: var(--shadow);
+			padding: 1rem;
+			display: grid;
+			gap: 0.9rem;
+			animation: rise-in 420ms ease-out;
+		}
+
+		.preview-section {
+			width: 100%;
+			background: rgba(255, 255, 255, 0.55);
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			padding: 0.9rem;
+		}
+
+		.preview-title {
+			margin: 0 0 0.7rem;
+			font-family: "Space Grotesk", sans-serif;
+			font-size: 1rem;
+		}
+
+		.preview-controls {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.45rem;
+			font-size: 0.95rem;
+			font-weight: 600;
+			margin: 0 0 0.8rem;
+		}
+
+		.state-grid {
+			display: grid;
+			gap: 0.65rem;
+			grid-template-columns: 1fr;
+		}
+
+		.mini-card {
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 0.7rem;
+			background: #fff;
+		}
+
+		.mini-label {
+			font-weight: 700;
+			font-size: 0.82rem;
+			color: var(--muted);
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+		}
+
+		.mini-card h3 {
+			margin: 0.35rem 0;
+			font-family: "Space Grotesk", sans-serif;
+			font-size: 1rem;
+			line-height: 1.2;
+		}
+
+		.mini-card h3.done {
+			text-decoration: line-through;
+			color: var(--muted);
+		}
+
+		.mini-meta {
+			display: flex;
+			gap: 0.4rem;
+			flex-wrap: wrap;
+			margin: 0.4rem 0;
+		}
+
+		.mini-time {
+			font-size: 0.9rem;
+			color: var(--muted);
+		}
+
+		@keyframes rise-in {
+			from {
+				opacity: 0;
+				transform: translateY(10px) scale(0.98);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+
+		.todo-header {
+			display: flex;
+			align-items: flex-start;
+			gap: 0.75rem;
+		}
+
+		.todo-title-wrap {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.todo-title {
+			margin: 0;
+			font-family: "Space Grotesk", sans-serif;
+			font-size: clamp(1.2rem, 2.4vw, 1.5rem);
+			line-height: 1.2;
+			word-break: break-word;
+		}
+
+		.todo-title.done {
+			text-decoration: line-through;
+			color: var(--muted);
+		}
+
+		.todo-description {
+			margin: 0;
+			font-size: 1rem;
+			color: var(--muted);
+			line-height: 1.45;
+			word-break: break-word;
+		}
+
+		.meta-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.55rem;
+			align-items: center;
+		}
+
+		.badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.35rem;
+			border-radius: 999px;
+			padding: 0.3rem 0.7rem;
+			font-size: 0.9rem;
+			font-weight: 700;
+			letter-spacing: 0.01em;
+			border: 1px solid transparent;
+			white-space: nowrap;
+		}
+
+		.priority-high {
+			background: var(--high-bg);
+			color: var(--high-text);
+			border-color: #fecaca;
+		}
+
+		.status {
+			background: var(--status-bg);
+			color: var(--status-text);
+			border-color: #bae6fd;
+		}
+
+		.time-row {
+			display: grid;
+			gap: 0.2rem;
+			color: var(--muted);
+			font-size: 0.95rem;
+		}
+
+		.time-row strong {
+			color: var(--text);
+		}
+
+		.toggle-row {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			width: fit-content;
+			font-weight: 600;
+		}
+
+		input[type="checkbox"] {
+			inline-size: 1rem;
+			block-size: 1rem;
+			accent-color: var(--accent);
+			cursor: pointer;
+		}
+
+		.tag-list {
+			list-style: none;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.45rem;
+			margin: 0;
+			padding: 0;
+		}
+
+		.tag {
+			background: var(--tag-bg);
+			color: var(--tag-text);
+			border-radius: 999px;
+			padding: 0.2rem 0.65rem;
+			border: 1px solid #bef264;
+			font-weight: 700;
+			font-size: 0.86rem;
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.55rem;
+			flex-wrap: wrap;
+		}
+
+		.btn {
+			border: 1px solid transparent;
+			background: #f8fafc;
+			color: var(--text);
+			border-radius: 10px;
+			padding: 0.5rem 0.85rem;
+			font-weight: 700;
+			font-family: "Source Sans 3", sans-serif;
+			cursor: pointer;
+			transition: transform 120ms ease, background-color 120ms ease;
+		}
+
+		.btn:hover {
+			transform: translateY(-1px);
+			background: #eef2ff;
+		}
+
+		.btn-delete {
+			background: var(--danger-bg);
+			color: var(--danger);
+			border-color: #fecaca;
+		}
+
+		.btn-delete:hover {
+			background: #fecaca;
+		}
+
+		.btn:focus-visible,
+		input[type="checkbox"]:focus-visible {
+			outline: 3px solid var(--accent);
+			outline-offset: 2px;
+		}
+
+		@media (min-width: 640px) {
+			.todo-card {
+				padding: 1.25rem;
+			}
+
+			.preview-section {
+				padding: 1rem;
+			}
+		}
+
+		@media (min-width: 900px) {
+			.state-grid {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+			}
+		}
+	</style>
+</head>
+<body>
+	<main class="page-stack">
+	<article class="todo-card" data-testid="test-todo-card" aria-label="Todo item card">
+		<div class="todo-header">
+			<div class="todo-title-wrap">
+				<h2 class="todo-title" data-testid="test-todo-title">Ship onboarding redesign with QA checklist</h2>
+			</div>
+		</div>
+
+		<p class="todo-description" data-testid="test-todo-description">
+			Finalize interaction notes, validate edge-case copy, and attach accessibility testing results before sign-off.
+		</p>
+
+		<div class="meta-row">
+			<span class="badge priority-high" data-testid="test-todo-priority" aria-label="Priority High">High</span>
+			<span class="badge status" data-testid="test-todo-status" aria-label="Current status In Progress">In Progress</span>
+		</div>
+
+		<div class="time-row">
+			<strong>Deadline</strong>
+			<time id="dueDate" data-testid="test-todo-due-date"></time>
+			<time id="timeRemaining" data-testid="test-todo-time-remaining" aria-live="polite"></time>
+		</div>
+
+		<div class="toggle-row">
+			<input id="todoCompleteToggle" data-testid="test-todo-complete-toggle" type="checkbox" />
+			<label for="todoCompleteToggle">Mark as complete</label>
+		</div>
+
+		<ul class="tag-list" role="list" data-testid="test-todo-tags" aria-label="Task tags">
+			<li class="tag" data-testid="test-todo-tag-work">work</li>
+			<li class="tag" data-testid="test-todo-tag-urgent">urgent</li>
+			<li class="tag">design</li>
+		</ul>
+
+		<div class="actions">
+			<button class="btn" data-testid="test-todo-edit-button" type="button">Edit</button>
+			<button class="btn btn-delete" data-testid="test-todo-delete-button" type="button">Delete</button>
+		</div>
+	</article>
+
+	<section class="preview-section" aria-label="Todo state previews">
+		<h2 class="preview-title">State preview harness</h2>
+		<div class="preview-controls">
+			<input id="freezePreviewTimes" type="checkbox" aria-label="Freeze preview times" />
+			<label for="freezePreviewTimes">Freeze preview times</label>
+		</div>
+		<div class="state-grid" role="list">
+			<article class="mini-card" role="listitem">
+				<div class="mini-label">Normal</div>
+				<h3>Prepare release notes</h3>
+				<div class="mini-meta">
+					<span class="badge priority-high">High</span>
+					<span class="badge status">In Progress</span>
+				</div>
+				<time class="mini-time" data-preview-offset="5"></time>
+			</article>
+
+			<article class="mini-card" role="listitem">
+				<div class="mini-label">Done</div>
+				<h3 class="done">Refactor auth middleware</h3>
+				<div class="mini-meta">
+					<span class="badge priority-high">High</span>
+					<span class="badge status">Done</span>
+				</div>
+				<time class="mini-time" data-preview-offset="2"></time>
+			</article>
+
+			<article class="mini-card" role="listitem">
+				<div class="mini-label">Overdue</div>
+				<h3>Deliver handoff docs</h3>
+				<div class="mini-meta">
+					<span class="badge priority-high">High</span>
+					<span class="badge status">Pending</span>
+				</div>
+				<time class="mini-time" data-preview-offset="-6"></time>
+			</article>
+		</div>
+	</section>
+	</main>
+
+	<script>
+		const dueDateElement = document.getElementById("dueDate");
+		const timeRemainingElement = document.getElementById("timeRemaining");
+		const completeToggle = document.getElementById("todoCompleteToggle");
+		const titleElement = document.querySelector('[data-testid="test-todo-title"]');
+		const statusElement = document.querySelector('[data-testid="test-todo-status"]');
+		const editButton = document.querySelector('[data-testid="test-todo-edit-button"]');
+		const deleteButton = document.querySelector('[data-testid="test-todo-delete-button"]');
+		const previewTimes = document.querySelectorAll("[data-preview-offset]");
+		const freezePreviewToggle = document.getElementById("freezePreviewTimes");
+		let isPreviewFrozen = false;
+
+		const dueDate = new Date(Date.now() + 50 * 60 * 60 * 1000);
+
+		function formatDueDate(dateObj) {
+			return `Due ${dateObj.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}`;
+		}
+
+		function pluralize(value, unit) {
+			return `${value} ${unit}${value === 1 ? "" : "s"}`;
+		}
+
+		function getTimeRemainingText(now, end) {
+			const deltaMs = end - now;
+			const absMs = Math.abs(deltaMs);
+			const minutes = Math.round(absMs / (1000 * 60));
+			const hours = Math.round(absMs / (1000 * 60 * 60));
+			const days = Math.round(absMs / (1000 * 60 * 60 * 24));
+
+			if (Math.abs(deltaMs) < 60 * 1000) {
+				return "Due now!";
+			}
+
+			if (deltaMs > 0) {
+				if (hours >= 24) {
+					if (days === 1) {
+						return "Due tomorrow";
+					}
+					return `Due in ${pluralize(days, "day")}`;
+				}
+
+				if (minutes >= 60) {
+					return `Due in ${pluralize(hours, "hour")}`;
+				}
+
+				return `Due in ${pluralize(minutes, "minute")}`;
+			}
+
+			if (hours >= 24) {
+				return `Overdue by ${pluralize(days, "day")}`;
+			}
+
+			if (minutes >= 60) {
+				return `Overdue by ${pluralize(hours, "hour")}`;
+			}
+
+			return `Overdue by ${pluralize(minutes, "minute")}`;
+		}
+
+		function refreshDueInfo() {
+			const now = new Date();
+			dueDateElement.dateTime = dueDate.toISOString();
+			dueDateElement.textContent = formatDueDate(dueDate);
+			timeRemainingElement.dateTime = dueDate.toISOString();
+			timeRemainingElement.textContent = getTimeRemainingText(now, dueDate);
+
+			if (isPreviewFrozen) {
+				return;
+			}
+
+			previewTimes.forEach((previewTime) => {
+				const offsetHours = Number(previewTime.getAttribute("data-preview-offset"));
+				const previewDueDate = new Date(now.getTime() + offsetHours * 60 * 60 * 1000);
+				previewTime.dateTime = previewDueDate.toISOString();
+				previewTime.textContent = getTimeRemainingText(now, previewDueDate);
+			});
+		}
+
+		completeToggle.addEventListener("change", (event) => {
+			const done = event.target.checked;
+			titleElement.classList.toggle("done", done);
+			statusElement.textContent = done ? "Done" : "In Progress";
+			statusElement.setAttribute("aria-label", `Current status ${statusElement.textContent}`);
+		});
+
+		editButton.addEventListener("click", () => {
+			console.log("edit clicked");
+		});
+
+		deleteButton.addEventListener("click", () => {
+			alert("Delete clicked");
+		});
+
+		freezePreviewToggle.addEventListener("change", (event) => {
+			isPreviewFrozen = event.target.checked;
+			if (!isPreviewFrozen) {
+				refreshDueInfo();
+			}
+		});
+
+		refreshDueInfo();
+		setInterval(refreshDueInfo, 30000);
+	</script>
+</body>
+</html>
